@@ -1,0 +1,11 @@
+name: streamlit_azure
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9.12
+  - pip
+  - pip:
+    - streamlit
+    - pandas
+    - numpy

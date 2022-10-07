@@ -1,0 +1,33 @@
+api-version: 2021-10-01
+location: westus
+name: streamlit_azure
+properties:
+  containers:
+  - name: streamlitapp
+    properties:
+      image: bpdsregistry.azurecr.io/streamlit_azure:v1
+      ports:
+      - port: 80
+        protocol: TCP
+      - port: 443
+        protocol: TCP
+      resources:
+        requests:
+          cpu: 2.0
+          memoryInGB: 1.5
+  imageRegistryCredentials:
+  - server: bpdsregistry.azurecr.io
+    username: bpdsregistry
+    password: 6k1xs6BWKM0BL9PMFTcLvh/DCW77uj6F
+  restartPolicy: Never
+  ipAddress:
+    ports:
+    - port: 443
+      protocol: TCP
+    - port: 80
+      protocol: TCP
+    type: Public
+    dnsNameLabel: streamlit_azure
+  osType: Linux
+tags: null
+type: Microsoft.ContainerInstance/containerGroups
