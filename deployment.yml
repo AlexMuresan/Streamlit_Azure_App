@@ -18,7 +18,7 @@ properties:
   imageRegistryCredentials:
   - server: bpdsregistry.azurecr.io
     username: bpdsregistry
-    password: 6k1xs6BWKM0BL9PMFTcLvh/DCW77uj6F
+    password: PASSWORD-HERE
   restartPolicy: Never
   ipAddress:
     ports:
