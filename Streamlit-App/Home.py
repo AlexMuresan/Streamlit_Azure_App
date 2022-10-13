@@ -3,7 +3,8 @@ import csv
 import numpy as np
 import pandas as pd
 import streamlit as st
-
+import sqlite3
+import glob
 
 @st.cache
 def get_chart_data():
@@ -35,6 +36,13 @@ if __name__ == "__main__":
         </style>
     '''
     st.markdown(hide_decoration_bar_style, unsafe_allow_html=True)
+
+    # create database button test...
+    st.write('DB testing...')
+    q = st.text_input('ls arg', '/')
+    if st.button('list files...'):
+        for f in glob.glob(q):
+            st.markdown(f)
 
     # Sidebar Code
     with st.sidebar:

@@ -1,11 +1,11 @@
 api-version: 2021-10-01
 location: westus
-name: streamlit_azure
+name: streamlit_azure-2
 properties:
   containers:
   - name: streamlitapp
     properties:
-      image: bpdsregistry.azurecr.io/streamlit_azure:v1
+      image: bpdsregistry.azurecr.io/azure_demo:v2
       ports:
       - port: 80
         protocol: TCP
@@ -15,10 +15,13 @@ properties:
         requests:
           cpu: 2.0
           memoryInGB: 1.5
+      volumeMounts:
+      - mountPath: /aci/data/
+        name: filesharevolume
   imageRegistryCredentials:
   - server: bpdsregistry.azurecr.io
     username: bpdsregistry
-    password: PASSWORD-HERE
+    password: <password>
   restartPolicy: Never
   ipAddress:
     ports:
@@ -27,7 +30,13 @@ properties:
     - port: 80
       protocol: TCP
     type: Public
-    dnsNameLabel: streamlit_azure
+    dnsNameLabel: streamlit-azure-2
   osType: Linux
-tags: null
+  volumes:
+  - name: filesharevolume
+    azureFile:
+      sharename: streamlit-azure-fileshare
+      storageAccountName: bpdsstreamlit
+      storageAccountKey: <key_here>
+tags: {}
 type: Microsoft.ContainerInstance/containerGroups
