@@ -49,3 +49,26 @@ In order to test the Docker image locally you can run the following commands
 ## Full length tutorial
 
 The full length tutorial is at [this link](https://towardsdatascience.com/beginner-guide-to-streamlit-deployment-on-azure-f6618eee1ba9).
+
+---
+
+# Fileshare Volume
+
+Some helpful commands to rebuild and launch application in azure. Some names should be changed for your particular image/etc.
+
+Rebuild image and push to azure container registry repository
+
+1. `docker build -t bpdsregistry.azurecr.io/azure_demo:v2 .`
+2. `docker push bpdsregistry.azurecr.io/azure_demo:v2`
+
+
+Deploy the image in an azure container
+
+1. `az container create --resource-group bpds_poc --name streamlit_azure-2 -f deployment.yml`
+
+Connect to a deployed container at bash prompt for exploration/debugging/etc
+
+1. `az container exec --resource-group bpds_poc --name streamlit_azure-2 --exec-command “/bin/bash”`
+
+ 
+
