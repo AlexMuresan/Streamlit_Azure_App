@@ -3,7 +3,9 @@ import csv
 import numpy as np
 import pandas as pd
 import pydeck as pdk
+import altair as alt
 import streamlit as st
+import matplotlib.pyplot as plt
 
 from sklearn.cluster import KMeans
 
@@ -18,7 +20,7 @@ def generate_colors(nr_colors):
 # @st.cache
 def get_dataframe():
     
-    df = pd.read_csv('tmp_dataset/super_store_geo.csv')
+    df = pd.read_csv('tmp_dataset/super_store_geo_v2.csv')
     df['lat'] = pd.to_numeric(df['lat'])
     df['lon'] = pd.to_numeric(df['lon'])
 
@@ -74,35 +76,101 @@ def plot_map_clusters(df):
 
 
 if __name__ == "__main__":
+    st.set_page_config(layout="wide")
     st.markdown("# Streamlit Map and Clustering")
+    # show_clustering = False
+
+    if 'show_clustering' not in st.session_state:
+        st.session_state.show_clustering = False
+
+    if 'show_channel_mix' not in st.session_state:
+        st.session_state.show_channel_mix = False
 
     df = get_dataframe()
     df = df.dropna()
 
-    nr_clusters = st.slider("Number of clusters", 1, 100, 10)
+    button_columns = st.columns(2)
+    graph_columns = st.columns(2)
 
-    cluster_features = ["City", "Category", "Sales", "Ship Mode"]
+    with button_columns[0]:
+        cluster_button = st.button("Toggle clusters")
+    with button_columns[1]:
+        mix_button = st.button("Toggle revenue")
 
-    options = np.insert(cluster_features, 0, "None")
-    weighted_feature = st.selectbox("Weighted feature", options)
+    if cluster_button:
+        st.session_state.show_clustering = not st.session_state.show_clustering
+    if mix_button:
+        st.session_state.show_channel_mix = not st.session_state.show_channel_mix
 
-    cluster_df = cluster_data(df, nr_clusters=nr_clusters, nr_cities=1000, features=cluster_features, weighted_feature=weighted_feature)
-    layers = plot_map_clusters(cluster_df)
-    # print(cluster_df)
+    with graph_columns[1]:
+        if st.session_state.show_channel_mix:
+            channel_count = df.groupby(by=['Channel']).count()[['Row ID']].rename(columns={"Row ID": "Count"}).reset_index()
+            channel_count['Percentage'] = channel_count['Count'] / channel_count['Count'].sum() * 100
+            channel_count['Percentage'] = channel_count['Percentage'].round(decimals=3).astype(str) + "%"
 
-    xlsx_cluster_data = st.file_uploader("Import Excel Clusters")
+            # colors = [
+            #     st.get_option('theme.primaryColor'),
+            #     st.get_option('theme.textColor')]
+            # colors = ["#ff2b2b", "#0067c9"]
+            colors = ["#ffaaab", "#ff2b2b"]
 
-    st.pydeck_chart(pdk.Deck(
-    map_style=None,
-    initial_view_state=pdk.ViewState(
-        latitude=37.0902,
-        longitude=-98.0,
-        zoom=3.2,
-        pitch=0,
-    ),
-    layers=layers))
-    
-    export_xcel_button = st.button("Export to Excel")
+            base = alt.Chart(channel_count).encode(
+                    theta=alt.Theta(field='Count', type='quantitative'),
+                    color=alt.Color(field='Channel', type='nominal')
+                )
 
-    if export_xcel_button:
-        cluster_df.to_excel("excel_cluster_data.xlsx")
+            pie_chart = base.mark_arc(outerRadius=120)
+            pie_text = base.mark_text(radius=180, size=25).encode(text="Percentage:N")
+
+            combined_chart = alt.layer(
+                pie_chart, pie_text
+            ).configure_title(
+                fontSize=24
+            ).configure_range(
+                category=alt.RangeScheme(colors)
+            )
+
+            st.markdown('## Revenue Channel Mix')
+            st.altair_chart(combined_chart, use_container_width=True)
+
+            historical_data = df.groupby('Order Date')[['Sales']].sum().reset_index(drop=False)
+            historical_data['Order Date'] = pd.to_datetime(historical_data['Order Date'], format="%d/%m/%Y")
+            historical_data = historical_data.set_index('Order Date')
+            historical_data = historical_data.groupby([historical_data.index.year, historical_data.index.month]).sum().reset_index(0).rename(columns={'Order Date': 'Order Year'})
+            historical_data = historical_data.reset_index(0).rename(columns={"Order Date":"Order Month"})
+            historical_data_pivot = historical_data.pivot(index='Order Month', columns='Order Year')
+            historical_data_pivot.columns = historical_data_pivot.columns.droplevel(0)
+
+            st.markdown("## Historical Profitability")
+            st.line_chart(historical_data_pivot)
+            
+
+    with graph_columns[0]:
+        if st.session_state.show_clustering:
+            nr_clusters = st.slider("Number of clusters", 1, 100, 10)
+
+            cluster_features = ["City", "Category", "Sales", "Ship Mode"]
+
+            options = np.insert(cluster_features, 0, "None")
+            weighted_feature = st.selectbox("Weighted feature", options)
+
+            cluster_df = cluster_data(df, nr_clusters=nr_clusters, nr_cities=1000, features=cluster_features, weighted_feature=weighted_feature)
+            layers = plot_map_clusters(cluster_df)
+            # print(cluster_df)
+
+            xlsx_cluster_data = st.file_uploader("Import Excel Clusters")
+
+            st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=37.0902,
+                longitude=-98.0,
+                zoom=3.2,
+                pitch=0,
+            ),
+            layers=layers))
+            
+            export_xcel_button = st.button("Export to Excel")
+
+            if export_xcel_button:
+                cluster_df.to_excel("excel_cluster_data.xlsx")
