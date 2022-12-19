@@ -6,6 +6,8 @@ dependencies:
   - python=3.9.12
   - pip
   - pip:
-    - streamlit
+    - streamlit==1.13.0
     - pandas
     - numpy
+    - scikit-learn
+    - pydeck

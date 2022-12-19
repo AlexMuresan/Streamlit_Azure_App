@@ -1,0 +1,68 @@
+.progress {
+	list-style: none;
+	font-size: 12pt;
+}
+
+.complete {
+	border-left: 0.2em solid #006ee6;
+	border-left-color: #006ee6;
+	padding: 1.6em 0 1.6em 0;
+	position: relative;
+}
+.complete::before {
+	content: "•";
+	font-size: 2.5em;
+	position: absolute;
+	left: -0.21em;
+	top: -0.45em;
+	color: #006ee6;
+	text-shadow: 0 0 3px #000000;
+}
+.incomplete {
+	border-left: 0.2em solid white;
+	padding: 1.6em 0 1.6em 0;
+	position: relative;
+}
+.incomplete::before {
+	content: "•";
+	font-size: 2.5em;
+	position: absolute;
+	left: -0.21em;
+	top: -0.45em;
+	color: white;
+	text-shadow: 0 0 3px #000000;
+}
+
+.final_item {
+	border: none;
+	left: 0.2em;
+}
+.final_item::before {
+	content: "•";
+	font-size: 2.5em;
+	position: absolute;
+	left: -0.21em;
+	top: -0.45em;
+	color: white;
+}
+
+.current {
+	border-left: 0.2em solid white;
+	padding: 1.6em 0 1.6em 0;
+	position: relative;
+}
+.current::before {
+	content: "•";
+	font-size: 2.5em;
+	position: absolute;
+	left: -0.21em;
+	top: -0.45em;
+	color: white;
+	animation: glow 1s infinite alternate;
+	-webkit-text-stroke: 1px #006ee6;
+}
+@keyframes glow {
+	to {
+	    text-shadow: 0 0 10px #006ee6;
+	}
+}

@@ -21,7 +21,7 @@ properties:
   imageRegistryCredentials:
   - server: bpdsregistry.azurecr.io
     username: bpdsregistry
-    password: <password>
+    password: 6k1xs6BWKM0BL9PMFTcLvh/DCW77uj6F
   restartPolicy: Never
   ipAddress:
     ports:
@@ -37,6 +37,6 @@ properties:
     azureFile:
       sharename: streamlit-azure-fileshare
       storageAccountName: bpdsstreamlit
-      storageAccountKey: <key_here>
+      storageAccountKey: 7mm9gyINS2sXTJWzu8Kn8ZXcXD8dZPW1grMhQ++XspgJtcim+DQnCstqreXMbkLji9ZZMBtpdHGd+AStkadttA==
 tags: {}
 type: Microsoft.ContainerInstance/containerGroups
